@@ -10,20 +10,21 @@ import java.util.*
 
 class HelloHandler(private val bucket: Bucket) {
 
-    suspend fun hello(req: ServerRequest) =
+    private suspend fun rateLimit(req: ServerRequest, f: suspend (ServerRequest) -> ServerResponse) =
         if (bucket.tryConsume(1))
-            ServerResponse.ok().bodyValueAndAwait("Hello World!")
+            f.invoke(req)
         else
             ServerResponse.status(429).buildAndAwait()
 
-    suspend fun helloWho(req: ServerRequest) =
-        if (bucket.tryConsume(1)) {
-            val capitalized = req.pathVariable("who").replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
-                else it.toString()
-            }
-            ServerResponse.ok().bodyValueAndAwait("Hello $capitalized")
-        } else
-            ServerResponse.status(429).buildAndAwait()
+    suspend fun hello(req: ServerRequest) = rateLimit(req) {
+        ServerResponse.ok().bodyValueAndAwait("Hello World!")
+    }
 
+    suspend fun helloWho(req: ServerRequest) = rateLimit(req) {
+        val capitalized = req.pathVariable("who").replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+            else it.toString()
+        }
+        ServerResponse.ok().bodyValueAndAwait("Hello $capitalized")
+    }
 }

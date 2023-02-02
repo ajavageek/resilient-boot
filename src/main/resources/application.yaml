@@ -1,0 +1,5 @@
+bucket4j.bucket:
+  size: 1
+  refresh:
+    tokens: 1
+    duration: PT1S

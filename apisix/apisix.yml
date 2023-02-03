@@ -1,0 +1,13 @@
+routes:
+  - uri: /hello*
+    upstream:
+      type: roundrobin
+      nodes:
+        "resilient-boot:8080": 1
+    plugins:
+      limit-req:
+        rate: 1
+        burst: 0
+        key: server_addr
+        rejected_code: 429
+#END

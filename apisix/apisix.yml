@@ -1,3 +1,12 @@
+consumers:
+  - username: joe
+    plugins:
+      key-auth:
+        key: joe
+  - username: jane
+    plugins:
+      key-auth:
+        key: jane
 routes:
   - uri: /hello*
     upstream:
@@ -8,6 +17,7 @@ routes:
       limit-req:
         rate: 1
         burst: 0
-        key: server_addr
+        key: consumer_name
         rejected_code: 429
+      key-auth: ~
 #END
